@@ -93,7 +93,7 @@ def execute_testcase(class_path: List[str], class_name: str, id: int) -> str:
 
 
 def jacocoagent_option(jacoco_settings: dict) -> str:
-    retval = "-javaagent:ext-modules/jacoco/jacoco-0.8.6/lib/jacocoagent.jar="
+    retval = "-javaagent:ext-modules/jacoco/lib/jacocoagent.jar="
     settings = []
     for setting_attr, setting_value in jacoco_settings.items():
         settings.append(f"{setting_attr}={setting_value}")
@@ -111,8 +111,7 @@ def swap_file_contents(file1_path: str, file2_path: str) -> None:
 
 
 def convert_to_report(jacoco_exec_file_path: str, id: str, dest_dir: str, target_class_path: str, project_source_pathes: List[str]) -> None:
-    proc = subprocess.run(["java", "-jar", "ext-modules/jacoco/jacoco-0.8.6/lib/jacococli.jar", "report", jacoco_exec_file_path, "--classfiles", target_class_path, "--html", dest_dir, "--name", f"jacoco{id}_report", "--sourcefiles", ";".join(project_source_pathes)], stdout=subprocess.DEVNULL)
-    # proc = subprocess.run(f"java -jar ext-modules/jacoco/jacoco-0.8.6/lib/jacococli.jar report {jacoco_exec_file_path} --classfiles {target_class_path} --html {dest_dir} --name jacoco{id}_report --sourcefiles \"{';'.join(project_source_pathes)}\"", shell=True)
+    proc = subprocess.run(["java", "-jar", "ext-modules/jacoco/lib/jacococli.jar", "report", jacoco_exec_file_path, "--classfiles", target_class_path, "--html", dest_dir, "--name", f"jacoco{id}_report", "--sourcefiles", ";".join(project_source_pathes)], stdout=subprocess.DEVNULL)
     if proc.returncode != 0:
         raise JacocoReportFailureError
 
