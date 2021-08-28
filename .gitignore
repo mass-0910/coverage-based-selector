@@ -1,0 +1,8 @@
+jacocoout/
+jacocoreport/
+ext-modules/
+.vscode/
+out/
+temp/
+tempobj/
+__pycache__/
