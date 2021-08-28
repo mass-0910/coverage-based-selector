@@ -25,7 +25,8 @@ def make_alone_test(testsource_path: str, leave_test_number: int, testcase_line_
     return alone_test_path
 
 def make_selected_test(testsource_path: str, selected_test_number_list: int, testcase_line_areas: list, out_testcase_dir: str) -> str:
-    selected_test_path = path.join(out_testcase_dir, path.basename(testsource_path).replace(".java", f"_selected.java"))
+    selected_testsource_name = path.basename(testsource_path).replace(".java", f"_selected.java")
+    selected_test_path = path.join(out_testcase_dir, selected_testsource_name)
     if not path.exists(out_testcase_dir):
         mkdir(out_testcase_dir)
     with open(testsource_path, mode='r') as fip, open(selected_test_path, mode='w') as fop:
@@ -33,6 +34,6 @@ def make_selected_test(testsource_path: str, selected_test_number_list: int, tes
         for i, area in enumerate(testcase_line_areas):
             if not i in selected_test_number_list:
                 filetext = remove_area_lines(filetext, area[0], area[1], i)
-                re.sub(f"\\")
+        filetext = re.sub(rf"(\W){path.basename(testsource_path).replace('.java', '')}(\W)", rf"\1{selected_testsource_name.replace('.java', '')}\2", filetext)
         fop.write(filetext)
     return selected_test_path
