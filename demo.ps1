@@ -1,0 +1,1 @@
+python src/main.py fizzbuzz/evosuite-tests/com/fizzbuzz/BugFizzBuzz_ESTest.java -t "fizzbuzz/src/main/java/com/fizzbuzz/BugFizzBuzz.java" --classpath ./fizzbuzz/target/classes --sourcepath fizzbuzz/src/main/java --additional_test_path fizzbuzz/evosuite-tests/com/fizzbuzz/BugFizzBuzz_ESTest_scaffolding.java -o out

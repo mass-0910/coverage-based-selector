@@ -10,9 +10,6 @@ import tqdm
 from bs4 import BeautifulSoup
 from copy import deepcopy
 
-classfile_dir = "./tempobj/"
-jacoco_dumpfile_dir = "./jacocoout/"
-
 
 class CompileFailureError(Exception):
     pass
@@ -72,15 +69,16 @@ def make_classpath(additional_classpath: List[str]) -> str:
         return ":".join(class_path)
 
 
-def compile_testcase(testsource_path: str, class_path: List[str], additional_testsource_path_list: List[str]) -> None:
-    if not path.exists(classfile_dir):
-        makedirs(classfile_dir)
+def compile_testcase(testsource_path: str, class_path: List[str], additional_testsource_path_list: List[str], classfile_dir: str) -> None:
+    if path.exists(classfile_dir):
+        rmtree(classfile_dir, ignore_errors=True)
+    makedirs(classfile_dir)
     proc = subprocess.run(["javac", "-g", "-cp", make_classpath(class_path), "-d", classfile_dir, testsource_path] + additional_testsource_path_list)
     if proc.returncode != 0:
         raise CompileFailureError(f"{testsource_path}のコンパイルに失敗")
 
 
-def execute_testcase(class_path: List[str], class_name: str, id: int) -> str:
+def execute_testcase(class_path: List[str], class_name: str, id: int, jacoco_dumpfile_dir: str) -> str:
     if not path.exists(jacoco_dumpfile_dir):
         makedirs(jacoco_dumpfile_dir)
     jacoco_settings = {
@@ -110,25 +108,29 @@ def swap_file_contents(file1_path: str, file2_path: str) -> None:
         fp2.write(file1_content)
 
 
-def convert_to_report(jacoco_exec_file_path: str, id: str, dest_dir: str, target_class_path: str, project_source_pathes: List[str]) -> None:
-    proc = subprocess.run(["java", "-jar", "ext-modules/jacoco/lib/jacococli.jar", "report", jacoco_exec_file_path, "--classfiles", target_class_path, "--html", dest_dir, "--name", f"jacoco{id}_report", "--sourcefiles", ";".join(project_source_pathes)], stdout=subprocess.DEVNULL)
+def get_classfiles_options(class_pathes: List[str]):
+    classfiles_options = []
+    for c in class_pathes:
+        classfiles_options += ["--classfiles", c]
+    return classfiles_options
+
+
+def convert_to_report(jacoco_exec_file_path: str, id: str, dest_dir: str, project_class_path: List[str], project_source_pathes: List[str]) -> None:
+    proc = subprocess.run(["java", "-jar", "ext-modules/jacoco/lib/jacococli.jar", "report", jacoco_exec_file_path] + get_classfiles_options(project_class_path) + ["--html", dest_dir, "--name", f"jacoco{id}_report", "--sourcefiles", ";".join(project_source_pathes)], stdout=subprocess.DEVNULL)
     if proc.returncode != 0:
         raise JacocoReportFailureError
 
 
-def measure_coverage(alone_test_path_list: List[str], original_test_path: str, tested_source_path: str, project_class_path: List[str], target_class_path: str, project_source_path: List[str], class_name: str, additional_testsource_path_list: List[str] = []):
+def measure_coverage(alone_test_path_list: List[str], original_test_path: str, tested_source_path: str, project_class_path: List[str], project_source_path: List[str], class_name: str, classfile_dir: str, jacoco_dumpfile_dir: str, jacoco_report_dir: str, additional_testsource_path_list: List[str] = []):
     coverage_list: List[Coverage] = []
     for i, alone_test_path in enumerate(tqdm.tqdm(alone_test_path_list)):
-        if path.exists(classfile_dir):
-            rmtree(classfile_dir, ignore_errors=True)
-        makedirs(classfile_dir)
         swap_file_contents(alone_test_path, original_test_path)
         try:
-            compile_testcase(original_test_path, project_class_path, additional_testsource_path_list)
-            jacoco_exec_file_path = execute_testcase(project_class_path + [classfile_dir], class_name, i)
-            convert_to_report(jacoco_exec_file_path, i, f"jacocoreport/test{i}", target_class_path, project_source_path)
+            compile_testcase(original_test_path, project_class_path, additional_testsource_path_list, classfile_dir)
+            jacoco_exec_file_path = execute_testcase(project_class_path + [classfile_dir], class_name, i, jacoco_dumpfile_dir)
+            convert_to_report(jacoco_exec_file_path, i, path.join(jacoco_report_dir, f"test{i}"), project_class_path, project_source_path)
             package_name = get_package_name(original_test_path)
-            coverage_list.append(get_line_coverage_info(path.join("jacocoreport", f"test{i}", package_name, f"{path.basename(tested_source_path)}.html")))
+            coverage_list.append(get_line_coverage_info(path.join(jacoco_report_dir, f"test{i}", package_name, f"{path.basename(tested_source_path)}.html")))
             swap_file_contents(alone_test_path, original_test_path)
         except:
             swap_file_contents(alone_test_path, original_test_path)

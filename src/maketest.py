@@ -1,5 +1,5 @@
 from os import path
-from os import mkdir
+from os import makedirs
 from typing import List
 import re
 
@@ -15,7 +15,7 @@ def remove_area_lines(s: str, start: int, end: int, test_number: int) -> str:
 def make_alone_test(testsource_path: str, leave_test_number: int, testcase_line_areas: list, temp_testcase_dir: str) -> str:
     alone_test_path = path.join(temp_testcase_dir, path.basename(testsource_path).replace(".java", f"_{leave_test_number}.java"))
     if not path.exists(temp_testcase_dir):
-        mkdir(temp_testcase_dir)
+        makedirs(temp_testcase_dir)
     with open(testsource_path, mode='r') as fip, open(alone_test_path, mode='w') as fop:
         filetext = fip.read()
         for i, area in enumerate(testcase_line_areas):
@@ -28,7 +28,7 @@ def make_selected_test(testsource_path: str, selected_test_number_list: int, tes
     selected_testsource_name = path.basename(testsource_path).replace(".java", f"_selected.java")
     selected_test_path = path.join(out_testcase_dir, selected_testsource_name)
     if not path.exists(out_testcase_dir):
-        mkdir(out_testcase_dir)
+        makedirs(out_testcase_dir)
     with open(testsource_path, mode='r') as fip, open(selected_test_path, mode='w') as fop:
         filetext = fip.read()
         for i, area in enumerate(testcase_line_areas):
@@ -36,4 +36,5 @@ def make_selected_test(testsource_path: str, selected_test_number_list: int, tes
                 filetext = remove_area_lines(filetext, area[0], area[1], i)
         filetext = re.sub(rf"(\W){path.basename(testsource_path).replace('.java', '')}(\W)", rf"\1{selected_testsource_name.replace('.java', '')}\2", filetext)
         fop.write(filetext)
+    print("選択したテストケースを以下に格納しました:", path.abspath(selected_test_path))
     return selected_test_path
