@@ -61,7 +61,7 @@ def make_classpath(additional_classpath: List[str]) -> str:
     class_path = deepcopy(additional_classpath)
     class_path.append("./ext-modules/evosuite-1.1.0.jar")
     class_path.append("./ext-modules/evosuite-standalone-runtime-1.1.0.jar")
-    class_path.append("./ext-modules/hamcrest-core-1.3.jar")
+    class_path.append("./ext-modules/hamcrest-2.2.jar")
     class_path.append("./ext-modules/junit-4.12.jar")
     if os.name == "nt":
         return ";".join(class_path)
