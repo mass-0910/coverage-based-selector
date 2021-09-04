@@ -3,7 +3,7 @@ import os
 from os import path
 from os import makedirs
 from shutil import rmtree
-from typing import List
+from typing import List, Tuple
 from copy import deepcopy
 from analyze import get_package_name
 import tqdm
@@ -50,7 +50,7 @@ class Coverage:
         ret_cov.not_covered_branch.sort()
         return ret_cov
 
-    def coverage_percentage(self) -> tuple[float, float]:
+    def coverage_percentage(self) -> Tuple[float, float]:
         return (
             len(self.passed_line) / (len(self.passed_line) + len(self.not_passed_line)),
             len(self.covered_branch) / (len(self.covered_branch) + len(self.not_covered_branch))

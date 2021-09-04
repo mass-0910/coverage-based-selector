@@ -1,7 +1,8 @@
 from coverage import Coverage
 from copy import deepcopy
+from typing import List
 
-def select_testcase(coverage_list: list[Coverage]):
+def select_testcase(coverage_list: List[Coverage]):
     empty_coverage = Coverage()
     empty_coverage.not_passed_line = coverage_list[0].passed_line + coverage_list[0].not_passed_line
     empty_coverage.not_covered_branch = coverage_list[0].covered_branch + coverage_list[0].not_covered_branch
@@ -9,7 +10,7 @@ def select_testcase(coverage_list: list[Coverage]):
     return sorted(road)
 
 
-def func(pre_merge: Coverage, left: list[Coverage], number: int = None) -> list[int]:
+def func(pre_merge: Coverage, left: List[Coverage], number: int = None) -> List[int]:
     road_list = None
     for i, l in enumerate(left):
         if l == None:
