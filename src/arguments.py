@@ -24,7 +24,7 @@ def get_inputs() -> dict:
     argparser.add_argument("-o", "--outdir", dest="output_dir", required=True, help="出力先ディレクトリ")
     args = argparser.parse_args()
     if args.tempfolder:
-        temp_dir = args.temp_folder
+        temp_dir = args.tempfolder
     else:
         temp_dir = "".join([random.choice(string.ascii_letters + string.digits) for i in range(10)])
     return {
