@@ -1,5 +1,4 @@
 import javalang
-import shlex
 
 
 def extract_lines(s: str, start, end):
@@ -12,7 +11,7 @@ def extract_declaration_area_close_line(s: str):
     count = 0
     close_count = 0
     final_line = 0
-    for token in shlex.split(s):
+    for token in [t.value for t in javalang.tokenizer.tokenize(s)]:
         if not first_blace_found and token == "{":
             first_blace_found = True
             count = 1
@@ -26,7 +25,7 @@ def extract_declaration_area_close_line(s: str):
                 break
     count = 0
     for i, line in enumerate(s.split('\n')):
-        count += shlex.split(line).count("}")
+        count += [t.value for t in javalang.tokenizer.tokenize(line)].count("}")
         if count == close_count:
             final_line = i
             break

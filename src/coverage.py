@@ -3,7 +3,7 @@ import os
 from os import path
 from os import makedirs
 from shutil import rmtree
-from typing import List
+from typing import List, Tuple
 from copy import deepcopy
 from analyze import get_package_name
 import tqdm
@@ -50,7 +50,7 @@ class Coverage:
         ret_cov.not_covered_branch.sort()
         return ret_cov
 
-    def coverage_percentage(self) -> tuple[float, float]:
+    def coverage_percentage(self) -> Tuple[float, float]:
         return (
             len(self.passed_line) / (len(self.passed_line) + len(self.not_passed_line)),
             len(self.covered_branch) / (len(self.covered_branch) + len(self.not_covered_branch))
@@ -61,7 +61,7 @@ def make_classpath(additional_classpath: List[str]) -> str:
     class_path = deepcopy(additional_classpath)
     class_path.append("./ext-modules/evosuite-1.1.0.jar")
     class_path.append("./ext-modules/evosuite-standalone-runtime-1.1.0.jar")
-    class_path.append("./ext-modules/hamcrest-core-1.3.jar")
+    class_path.append("./ext-modules/hamcrest-2.2.jar")
     class_path.append("./ext-modules/junit-4.12.jar")
     if os.name == "nt":
         return ";".join(class_path)
