@@ -20,10 +20,6 @@ class JacocoReportFailureError(Exception):
 
 
 class Coverage:
-    passed_line: List[int]
-    not_passed_line: List[int]
-    covered_branch: List[int]
-    not_covered_branch: List[int]
 
     def __init__(self):
         self.passed_line: List[int] = []
