@@ -1,0 +1,3 @@
+javalang
+tqdm
+beautifulsoup4
