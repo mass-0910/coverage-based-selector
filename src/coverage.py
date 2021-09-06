@@ -20,10 +20,6 @@ class JacocoReportFailureError(Exception):
 
 
 class Coverage:
-    passed_line: List[int]
-    not_passed_line: List[int]
-    covered_branch: List[int]
-    not_covered_branch: List[int]
 
     def __init__(self):
         self.passed_line: List[int] = []
@@ -58,11 +54,12 @@ class Coverage:
 
 
 def make_classpath(additional_classpath: List[str]) -> str:
+    ext_modules_abspath = path.join(path.dirname(path.dirname(path.abspath(__file__))), "ext-modules")
     class_path = deepcopy(additional_classpath)
-    class_path.append("./ext-modules/evosuite-1.1.0.jar")
-    class_path.append("./ext-modules/evosuite-standalone-runtime-1.1.0.jar")
-    class_path.append("./ext-modules/hamcrest-2.2.jar")
-    class_path.append("./ext-modules/junit-4.12.jar")
+    class_path.append(path.join(ext_modules_abspath, "evosuite-1.1.0.jar"))
+    class_path.append(path.join(ext_modules_abspath, "evosuite-standalone-runtime-1.1.0.jar"))
+    class_path.append(path.join(ext_modules_abspath, "hamcrest-2.2.jar"))
+    class_path.append(path.join(ext_modules_abspath, "junit-4.12.jar"))
     if os.name == "nt":
         return ";".join(class_path)
     else:
@@ -91,7 +88,8 @@ def execute_testcase(class_path: List[str], class_name: str, id: int, jacoco_dum
 
 
 def jacocoagent_option(jacoco_settings: dict) -> str:
-    retval = "-javaagent:ext-modules/jacoco/lib/jacocoagent.jar="
+    ext_modules_abspath = path.join(path.dirname(path.dirname(path.abspath(__file__))), "ext-modules")
+    retval = f"-javaagent:{path.join(ext_modules_abspath, 'jacoco', 'lib', 'jacocoagent.jar')}="
     settings = []
     for setting_attr, setting_value in jacoco_settings.items():
         settings.append(f"{setting_attr}={setting_value}")
@@ -116,7 +114,9 @@ def get_classfiles_options(class_pathes: List[str]):
 
 
 def convert_to_report(jacoco_exec_file_path: str, id: str, dest_dir: str, project_class_path: List[str], project_source_pathes: List[str]) -> None:
-    proc = subprocess.run(["java", "-jar", "ext-modules/jacoco/lib/jacococli.jar", "report", jacoco_exec_file_path] + get_classfiles_options(project_class_path) + ["--html", dest_dir, "--name", f"jacoco{id}_report", "--sourcefiles", ";".join(project_source_pathes)], stdout=subprocess.DEVNULL)
+    ext_modules_abspath = path.join(path.dirname(path.dirname(path.abspath(__file__))), "ext-modules")
+    jacococli_path = path.join(ext_modules_abspath, 'jacoco', 'lib', 'jacococli.jar')
+    proc = subprocess.run(["java", "-jar", jacococli_path, "report", jacoco_exec_file_path] + get_classfiles_options(project_class_path) + ["--html", dest_dir, "--name", f"jacoco{id}_report", "--sourcefiles", ";".join(project_source_pathes)], stdout=subprocess.DEVNULL)
     if proc.returncode != 0:
         raise JacocoReportFailureError
 
